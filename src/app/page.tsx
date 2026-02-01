@@ -153,8 +153,6 @@ function InteractiveChart() {
 function AgentWorkflowAnimation() {
   const centerX = 50;
   const centerY = 50;
-  const nodeBoxW = 6;
-  const nodeBoxH = 7;
 
   // All nodes at equal distance from center (~49.5) for equal line length
   const radius = 35 * Math.sqrt(2); // ~49.5, matches corner distance
@@ -166,12 +164,12 @@ function AgentWorkflowAnimation() {
   { icon: Search, label: "Analyse", lineLabel: "Auswerten", x: 15, y: 85 },
   { icon: Briefcase, label: "CRM", lineLabel: "Aktualisieren", x: 85, y: 85 }];
 
-  // Shorten line minimally so lines extend close to nodes (longer lines for labels)
+  // Shorten line so it stops before the icon box (avoids overlap with CRM and other nodes)
   const lineEnd = (nx: number, ny: number) => {
     const dx = nx - centerX;
     const dy = ny - centerY;
     const dist = Math.sqrt(dx * dx + dy * dy);
-    const shorten = 0.5;
+    const shorten = 5; // Stop line before icon box
     if (dist <= shorten) return { x: nx, y: ny };
     const t = 1 - shorten / dist;
     return { x: centerX + dx * t, y: centerY + dy * t };
@@ -210,16 +208,26 @@ function AgentWorkflowAnimation() {
                   strokeOpacity="0.2"
                   fill="none"
                 />
-                {/* Draw-in animation on mount */}
+                {/* Draw-in animation: von innen nach außen (center → node) */}
                 <motion.path
                   d={`M ${centerX} ${centerY} L ${end.x} ${end.y}`}
                   stroke="#ff6b35"
                   strokeWidth="0.5"
                   strokeOpacity="0.5"
+                  strokeLinecap="round"
                   fill="none"
                   initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 0.8, delay: i * 0.12, ease: "easeOut" }}
+                  animate={{ pathLength: [0, 1] }}
+                  transition={{
+                    pathLength: {
+                      duration: 1.5,
+                      delay: i * 0.15,
+                      repeat: Infinity,
+                      repeatType: "reverse",
+                      ease: "easeInOut",
+                      repeatDelay: 0.3,
+                    },
+                  }}
                 />
                 {/* Flowing dashed animation - data moving along the line */}
                 <motion.path
@@ -289,31 +297,25 @@ function AgentWorkflowAnimation() {
             })}
           </g>
 
-          {/* Node icons at line endpoints - foreignObject for exact SVG coordinate alignment */}
-          {nodes.map((node, i) => {
-            const NodeIcon = node.icon;
-            return (
-              <foreignObject
-                key={`node-${i}`}
-                x={node.x - nodeBoxW / 2}
-                y={node.y - nodeBoxH / 2}
-                width={nodeBoxW}
-                height={nodeBoxH}
-                className="overflow-visible"
-              >
-                <motion.div
-                  className="w-full h-full flex flex-col items-center justify-center gap-0.5 bg-transparent transition-all duration-300"
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.15, type: "spring", stiffness: 200 }}
-                >
-                  <NodeIcon className="w-2 h-2 text-[#ff6b35] shrink-0" />
-                  <span className="text-[2px] font-semibold text-white/95 uppercase tracking-wider leading-tight">{node.label}</span>
-                </motion.div>
-              </foreignObject>
-            );
-          })}
         </svg>
+
+        {/* Node icons - same positioning as central robot box, absolute with % coordinates */}
+        {nodes.map((node, i) => {
+          const NodeIcon = node.icon;
+          return (
+            <motion.div
+              key={`node-${i}`}
+              className="absolute -translate-x-1/2 -translate-y-1/2 bg-[#0a1628] rounded-3xl border border-[#ff6b35] flex flex-col items-center justify-center gap-0.5 p-1.5 z-20 shadow-[0_0_30px_rgba(255,107,53,0.4)] w-20 h-20"
+              style={{ left: `${node.x}%`, top: `${node.y}%` }}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.15, type: "spring", stiffness: 200 }}
+            >
+              <NodeIcon className="w-5 h-5 text-[#ff6b35] shrink-0" />
+              <span className="text-[10px] font-normal text-white/95 uppercase tracking-wider leading-tight">{node.label}</span>
+            </motion.div>
+          );
+        })}
 
         {/* Subtle ambient particles */}
         {[...Array(4)].map((_, i) =>
@@ -337,7 +339,7 @@ function HeroSection() {
     offset: ["start start", "end start"]
   });
 
-  const sunY = useTransform(scrollYProgress, [0, 1], [0, -250]);
+  const sunY = useTransform(scrollYProgress, [0, 1], [0, -100]);
   const sunScale = useTransform(scrollYProgress, [0, 0.5], [1, 1.3]);
   const glowOpacity = useTransform(scrollYProgress, [0, 0.5], [0.7, 1]);
   const skyBrightness = useTransform(scrollYProgress, [0, 0.5], [0.05, 0.2]);
@@ -482,8 +484,8 @@ function AboutSection() {
 
   return (
     <section className="py-24 lg:py-32 bg-gradient-to-b from-[#0a1628] to-[#0d1a2d] relative overflow-hidden">
-      <div className="absolute top-0 bottom-0 left-0 w-64 bg-gradient-to-r from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
-      <div className="absolute top-0 bottom-0 right-0 w-64 bg-gradient-to-l from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
+      <div className="absolute top-0 bottom-0 left-0 w-12 md:w-24 lg:w-40 xl:w-56 bg-gradient-to-r from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
+      <div className="absolute top-0 bottom-0 right-0 w-12 md:w-24 lg:w-40 xl:w-56 bg-gradient-to-l from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
       <div className="max-w-6xl mx-auto px-6 lg:px-8 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -632,8 +634,8 @@ function PotentialSection() {
   return (
     <section className="py-16 lg:py-20 bg-[#0d1a2d] relative overflow-hidden">
       {/* Side Gradients */}
-      <div className="absolute top-0 bottom-0 left-0 w-64 bg-gradient-to-r from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
-      <div className="absolute top-0 bottom-0 right-0 w-64 bg-gradient-to-l from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
+      <div className="absolute top-0 bottom-0 left-0 w-12 md:w-24 lg:w-40 xl:w-56 bg-gradient-to-r from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
+      <div className="absolute top-0 bottom-0 right-0 w-12 md:w-24 lg:w-40 xl:w-56 bg-gradient-to-l from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
       {/* Background Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20">
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-[#ff6b35]/20 rounded-full blur-[120px] animate-pulse" />
@@ -934,8 +936,8 @@ function ImpactSection() {
 
   return (
     <section className="py-24 lg:py-32 bg-[#0a1628] relative overflow-hidden">
-      <div className="absolute top-0 bottom-0 left-0 w-64 bg-gradient-to-r from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
-      <div className="absolute top-0 bottom-0 right-0 w-64 bg-gradient-to-l from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
+      <div className="absolute top-0 bottom-0 left-0 w-12 md:w-24 lg:w-40 xl:w-56 bg-gradient-to-r from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
+      <div className="absolute top-0 bottom-0 right-0 w-12 md:w-24 lg:w-40 xl:w-56 bg-gradient-to-l from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1222,8 +1224,8 @@ function BlogSection() {
   return (
     <section className="py-24 lg:py-32 bg-[#0a1628] relative overflow-hidden">
       {/* Side Gradients */}
-      <div className="absolute top-0 bottom-0 left-0 w-64 bg-gradient-to-r from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
-      <div className="absolute top-0 bottom-0 right-0 w-64 bg-gradient-to-l from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
+      <div className="absolute top-0 bottom-0 left-0 w-12 md:w-24 lg:w-40 xl:w-56 bg-gradient-to-r from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
+      <div className="absolute top-0 bottom-0 right-0 w-12 md:w-24 lg:w-40 xl:w-56 bg-gradient-to-l from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
       {/* Decorative Background Elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-[#ff6b35]/5 rounded-full blur-[120px] -mr-48 -mt-48" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/5 rounded-full blur-[120px] -ml-48 -mb-48" />
@@ -1427,8 +1429,8 @@ function FAQSection() {
 function CTASection() {
   return (
     <section className="py-24 lg:py-32 bg-[#0a1628] relative overflow-hidden">
-      <div className="absolute top-0 bottom-0 left-0 w-64 bg-gradient-to-r from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
-      <div className="absolute top-0 bottom-0 right-0 w-64 bg-gradient-to-l from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
+      <div className="absolute top-0 bottom-0 left-0 w-12 md:w-24 lg:w-40 xl:w-56 bg-gradient-to-r from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
+      <div className="absolute top-0 bottom-0 right-0 w-12 md:w-24 lg:w-40 xl:w-56 bg-gradient-to-l from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

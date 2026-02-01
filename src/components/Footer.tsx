@@ -7,8 +7,8 @@ import { openExternalUrl, CALENDLY_LINK, LINKEDIN_LINK, PHONE_LINK } from "@/lib
 export function Footer() {
   return (
     <footer className="bg-[#0a1628] text-white relative overflow-hidden">
-      <div className="absolute top-0 bottom-0 left-0 w-64 bg-gradient-to-r from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
-      <div className="absolute top-0 bottom-0 right-0 w-64 bg-gradient-to-l from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
+      <div className="absolute top-0 bottom-0 left-0 w-12 md:w-24 lg:w-40 xl:w-56 bg-gradient-to-r from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
+      <div className="absolute top-0 bottom-0 right-0 w-12 md:w-24 lg:w-40 xl:w-56 bg-gradient-to-l from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-20 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
             <div className="lg:col-span-2">
@@ -24,7 +24,7 @@ export function Footer() {
                 KI, die liefert. Keine Buzzwords, keine Pilotprojekte ohne Ende.
               </p>
             </div>
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               <button
                 onClick={() => openExternalUrl(CALENDLY_LINK)}
                 className="flex items-center gap-2 px-5 py-3 btn-primary text-white font-semibold rounded-full"
