@@ -153,20 +153,35 @@ function InteractiveChart() {
 function AgentWorkflowAnimation() {
   const centerX = 50;
   const centerY = 50;
+  const nodeBoxW = 6;
+  const nodeBoxH = 7;
 
+  // All nodes at equal distance from center (~49.5) for equal line length
+  const radius = 35 * Math.sqrt(2); // ~49.5, matches corner distance
   const nodes = [
-  { icon: Mail, label: "Email", x: 15, y: 15 },
-  { icon: FileText, label: "Dokument", x: 85, y: 15 },
-  { icon: Globe, label: "Website", x: 15, y: 50 },
-  { icon: Phone, label: "Anruf", x: 85, y: 50 },
-  { icon: Search, label: "Analyse", x: 15, y: 85 },
-  { icon: Briefcase, label: "CRM", x: 85, y: 85 }];
+  { icon: Mail, label: "Email", lineLabel: "Beantworten", x: 15, y: 15 },
+  { icon: FileText, label: "Dokument", lineLabel: ["Verarbeiten &", "Erstellen"], x: 85, y: 15 },
+  { icon: Globe, label: "Website", lineLabel: "Updaten", x: 50 - radius, y: 50 },
+  { icon: Phone, label: "Anruf", lineLabel: ["Beantworten &", "Protokollieren"], x: 50 + radius, y: 50 },
+  { icon: Search, label: "Analyse", lineLabel: "Auswerten", x: 15, y: 85 },
+  { icon: Briefcase, label: "CRM", lineLabel: "Aktualisieren", x: 85, y: 85 }];
+
+  // Shorten line minimally so lines extend close to nodes (longer lines for labels)
+  const lineEnd = (nx: number, ny: number) => {
+    const dx = nx - centerX;
+    const dy = ny - centerY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const shorten = 0.5;
+    if (dist <= shorten) return { x: nx, y: ny };
+    const t = 1 - shorten / dist;
+    return { x: centerX + dx * t, y: centerY + dy * t };
+  };
 
 
   return (
     <div className="relative w-full aspect-square max-w-2xl mx-auto scale-100 origin-center">
       <div className="absolute inset-0 flex items-center justify-center !w-full !h-[583px]">
-        <div className="absolute inset-0 opacity-10 !w-[680px] !h-[640px]" style={{ backgroundImage: 'radial-gradient(#ff6b35 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+        <div className="absolute inset-0 opacity-20 !w-[680px] !h-[640px]" style={{ backgroundImage: 'radial-gradient(#ff6b35 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
         
         {/* Central Agent */}
         <motion.div
@@ -176,72 +191,138 @@ function AgentWorkflowAnimation() {
           <Bot className="w-14 h-14 text-[#ff6b35]" />
         </motion.div>
 
-        {/* Workflow Nodes - Symmetrical Layout */}
-        {nodes.map((node, i) =>
-        <motion.div
-          key={i}
-          className="absolute w-20 h-20 bg-white/5 backdrop-blur-md rounded-2xl border border-white/20 flex flex-col items-center justify-center gap-1.5 z-10 shadow-xl hover:border-[#ff6b35]/50 transition-colors"
-          style={{ left: `${node.x}%`, top: `${node.y}%`, transform: 'translate(-50%, -50%)' }}
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: i * 0.15, type: "spring", stiffness: 200 }}>
-            <node.icon className="w-8 h-8 text-white/80" />
-            <span className="text-[10px] font-mono text-white/60 uppercase tracking-wider">{node.label}</span>
-          </motion.div>
-        )}
+        {/* Lines and Nodes - shared SVG coordinate system so icons align with line endpoints */}
+        <svg className="absolute inset-0 w-full h-full z-10 overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
+          {/* Connecting lines */}
+          <g className="pointer-events-none">
+            {nodes.map((node, i) => {
+              const end = lineEnd(node.x, node.y);
+              return (
+              <g key={`line-${i}`}>
+                {/* Base line (subtle) */}
+                <line
+                  x1={centerX}
+                  y1={centerY}
+                  x2={end.x}
+                  y2={end.y}
+                  stroke="#ff6b35"
+                  strokeWidth="0.5"
+                  strokeOpacity="0.2"
+                  fill="none"
+                />
+                {/* Draw-in animation on mount */}
+                <motion.path
+                  d={`M ${centerX} ${centerY} L ${end.x} ${end.y}`}
+                  stroke="#ff6b35"
+                  strokeWidth="0.5"
+                  strokeOpacity="0.5"
+                  fill="none"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 0.8, delay: i * 0.12, ease: "easeOut" }}
+                />
+                {/* Flowing dashed animation - data moving along the line */}
+                <motion.path
+                  d={`M ${centerX} ${centerY} L ${end.x} ${end.y}`}
+                  stroke="#ff6b35"
+                  strokeWidth="0.5"
+                  strokeOpacity="0.65"
+                  fill="none"
+                  strokeDasharray="1.5 4"
+                  initial={{ opacity: 0 }}
+                  animate={{
+                    opacity: 1,
+                    strokeDashoffset: [0, -5.5],
+                  }}
+                  transition={{
+                    opacity: { duration: 0.3, delay: 0.7 + i * 0.12 },
+                    strokeDashoffset: {
+                      duration: 1.2,
+                      repeat: Infinity,
+                      ease: "linear",
+                      delay: 1 + i * 0.15,
+                    },
+                  }}
+                />
+                {/* Line label - offset perpendicular to line to avoid overlap */}
+                {(() => {
+                  const midX = (centerX + end.x) / 2;
+                  const midY = (centerY + end.y) / 2;
+                  const dx = end.x - centerX;
+                  const dy = end.y - centerY;
+                  const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                  const perpX = -dy / dist;
+                  const perpY = dx / dist;
+                  const offset = 3;
+                  const labelX = midX + perpX * offset;
+                  const labelY = midY + perpY * offset;
+                  const angle = Math.atan2(dy, dx);
+                  const deg = (angle * 180) / Math.PI;
+                  const rotate = deg > 90 || deg < -90 ? deg + 180 : deg;
+                  return (
+                    <motion.text
+                      x={labelX}
+                      y={labelY}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fill="rgba(255,255,255,0.7)"
+                      fontSize="2.5"
+                      fontWeight="500"
+                      style={{ fontFamily: "system-ui, sans-serif" }}
+                      transform={`rotate(${rotate} ${labelX} ${labelY})`}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.5, delay: 0.5 + i * 0.1 }}
+                    >
+                      {Array.isArray(node.lineLabel)
+                        ? node.lineLabel.map((line, j) => (
+                            <tspan key={j} x={labelX} dy={j === 0 ? 0 : "1.2em"}>
+                              {line}
+                            </tspan>
+                          ))
+                        : node.lineLabel}
+                    </motion.text>
+                  );
+                })()}
+              </g>
+            );
+            })}
+          </g>
 
-        {/* Animated Connecting Lines */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
-          {nodes.map((node, i) =>
-          <g key={i}>
-              <motion.line
-              x1={centerX}
-              y1={centerY}
-              x2={node.x}
-              y2={node.y}
-              stroke="#ff6b35"
-              strokeWidth="0.4"
-              strokeOpacity="0.25"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ duration: 1, delay: i * 0.1 }} />
-              <motion.circle
-              r="1.5"
-              fill="#ff6b35"
-              style={{ filter: "drop-shadow(0 0 8px #ff6b35)" }}
-              initial={{ opacity: 0 }}
-              animate={{
-                opacity: [0, 1, 1, 0],
-                cx: [centerX, node.x],
-                cy: [centerY, node.y]
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                delay: i * 0.3,
-                ease: "easeInOut",
-                times: [0, 0.1, 0.9, 1]
-              }} />
-            </g>
-          )}
+          {/* Node icons at line endpoints - foreignObject for exact SVG coordinate alignment */}
+          {nodes.map((node, i) => {
+            const NodeIcon = node.icon;
+            return (
+              <foreignObject
+                key={`node-${i}`}
+                x={node.x - nodeBoxW / 2}
+                y={node.y - nodeBoxH / 2}
+                width={nodeBoxW}
+                height={nodeBoxH}
+                className="overflow-visible"
+              >
+                <motion.div
+                  className="w-full h-full flex flex-col items-center justify-center gap-0.5 bg-transparent transition-all duration-300"
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.15, type: "spring", stiffness: 200 }}
+                >
+                  <NodeIcon className="w-2 h-2 text-[#ff6b35] shrink-0" />
+                  <span className="text-[2px] font-semibold text-white/95 uppercase tracking-wider leading-tight">{node.label}</span>
+                </motion.div>
+              </foreignObject>
+            );
+          })}
         </svg>
 
-        {/* Floating Data Particles */}
-        {[...Array(6)].map((_, i) =>
+        {/* Subtle ambient particles */}
+        {[...Array(4)].map((_, i) =>
         <motion.div
           key={i}
-          className="absolute w-1 h-1 bg-[#ff6b35] rounded-full blur-[1px]"
-          animate={{
-            x: [Math.random() * 400, Math.random() * 400],
-            y: [Math.random() * 400, Math.random() * 400],
-            opacity: [0, 1, 0]
-          }}
-          transition={{
-            duration: 3 + Math.random() * 5,
-            repeat: Infinity,
-            ease: "linear"
-          }} />
-
+          className="absolute w-1 h-1 bg-[#ff6b35]/60 rounded-full"
+          style={{ left: `${20 + i * 20}%`, top: `${30 + (i % 2) * 40}%` }}
+          animate={{ opacity: [0.2, 0.6, 0.2] }}
+          transition={{ duration: 2 + i * 0.5, repeat: Infinity, ease: "easeInOut" }} />
         )}
       </div>
     </div>);
@@ -505,13 +586,13 @@ function AboutSection() {
         className="mt-12 pt-8">
         <p className="text-center text-white/40 text-sm mb-4">Affiliiert mit</p>
         
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md py-8 px-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]">
+        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md py-6 px-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]">
           <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#0a1628] via-[#0a1628]/80 to-transparent z-10 pointer-events-none" />
           <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#0a1628] via-[#0a1628]/80 to-transparent z-10 pointer-events-none" />
           
           <div className="flex animate-marquee">
             {[...affiliationLogos, ...affiliationLogos].map((logo, i) =>
-            <div key={i} className="flex-shrink-0 mx-10 lg:mx-20 h-14 lg:h-20 flex items-center">
+            <div key={i} className="flex-shrink-0 mx-8 lg:mx-14 h-12 lg:h-16 flex items-center">
                 <img
                 src={logo.src}
                 alt={logo.alt}
