@@ -583,7 +583,7 @@ function AboutSection() {
 
 
   return (
-    <section className="py-24 lg:py-32 bg-gradient-to-b from-[#0a1628] to-[#0d1a2d] relative overflow-hidden">
+    <section className="py-16 sm:py-20 lg:py-32 bg-gradient-to-b from-[#0a1628] to-[#0d1a2d] relative overflow-hidden">
       <div className="absolute top-0 bottom-0 left-0 w-12 md:w-24 lg:w-40 xl:w-56 bg-gradient-to-r from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
       <div className="absolute top-0 bottom-0 right-0 w-12 md:w-24 lg:w-40 xl:w-56 bg-gradient-to-l from-[#ff6b35]/20 via-[#ff8c5a]/10 to-transparent pointer-events-none" />
       <div className="max-w-6xl mx-auto px-6 lg:px-8 relative z-10">
@@ -595,24 +595,24 @@ function AboutSection() {
           <span className="inline-block px-4 py-2 rounded-full bg-[#ff6b35]/20 text-[#ff6b35] text-sm font-medium mb-4">
             Über mich
           </span>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
             Nicole Thorisch
           </h2>
-            <p className="text-xl text-[#94a3b8]">
+            <p className="text-base sm:text-lg lg:text-xl text-[#94a3b8]">
               Physikerin & KI/ML Engineer | Expertin für Deep Learning & Software Entwicklung
             </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="space-y-6 !w-[559px] !h-full">
-            <p className="text-lg text-white/80 leading-relaxed">
+            className="space-y-6 w-full max-w-[559px] lg:max-w-none order-2 lg:order-1">
+            <p className="text-base sm:text-lg text-white/80 leading-relaxed">
               Als <span className="text-white font-medium">KI Ingenieurin</span> am <span className="text-white font-medium">Max-Planck-Institut für Quantenoptik</span> entwickle ich hochpräzise Machine Learning Architekturen in der Gruppe von <span className="text-[#ff6b35]">Nobelpreisträger Prof. Ferenc Krausz</span>. Mein Fokus liegt auf der Skalierung komplexer Modelle für die Früherkennung kritischer Krankheiten mittels <span className="text-white font-medium">Deep Learning</span> und <span className="text-white font-medium">Reinforcement Learning</span>.
             </p>
-            <p className="text-lg text-white/70 leading-relaxed">
+            <p className="text-base sm:text-lg text-white/70 leading-relaxed">
               Nach meiner Forschung an der <span className="text-white font-medium">Harvard Medical School</span> und bei <span className="text-white font-medium">TUM.ai</span> im Bereich 3D Computer Vision, verbinde ich heute wissenschaftliche Exzellenz mit professioneller <span className="text-white font-medium">Software Entwicklung</span>: Von der Daten-Pipeline bis zum fertigen LLM-System.
             </p>
 
@@ -624,7 +624,7 @@ function AboutSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="flex gap-4 p-4 rounded-xl bg-white/5 border border-white/10">
+                className="flex gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#ff6b35] to-[#ff8c5a] flex items-center justify-center flex-shrink-0">
                     <cred.icon className="w-6 h-6 text-white" />
                   </div>
@@ -667,8 +667,8 @@ function AboutSection() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="relative hidden lg:block">
-            <div className="relative w-80 h-80 mx-auto">
+            className="relative order-1 lg:order-2 flex justify-center">
+            <div className="relative w-56 h-56 sm:w-72 sm:h-72 lg:w-80 lg:h-80 mx-auto">
               <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#ff6b35]/20 to-[#ff8c5a]/10 blur-2xl" />
               <img
                 src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/project-uploads/ebddd4d1-529f-4f5c-8cf9-5c0783c3927a/image-1769616082980.png?width=8000&height=8000&resize=contain"
