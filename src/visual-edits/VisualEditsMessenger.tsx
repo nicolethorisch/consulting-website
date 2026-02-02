@@ -1251,11 +1251,12 @@ export default function HoverReceiver() {
   useEffect(() => {
     if (!isVisualEditMode) return;
 
-    // Prevent link clicks
+    // Prevent link clicks (except elements marked as interactive - CTAs, nav links)
     const preventLinkClick = (e: Event) => {
       const target = e.target as HTMLElement;
       const link = target.closest("a");
       if (link && !link.isContentEditable) {
+        if (link.hasAttribute("data-orchids-interactive")) return;
         e.preventDefault();
         e.stopPropagation();
       }
@@ -1504,6 +1505,11 @@ export default function HoverReceiver() {
       lastClickTimeRef.current = now;
 
       const target = e.target as HTMLElement;
+      // Allow clicks to pass through for interactive CTAs (links, buttons)
+      if (target.closest("[data-orchids-interactive]")) {
+        return;
+      }
+
       const hit = target.closest<HTMLElement>("[data-orchids-id]");
 
       if (hit) {

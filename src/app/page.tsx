@@ -175,22 +175,73 @@ function AgentWorkflowAnimation() {
     return { x: centerX + dx * t, y: centerY + dy * t };
   };
 
-
   return (
     <div className="relative w-full aspect-square max-w-2xl mx-auto scale-100 origin-center">
       <div className="absolute inset-0 flex items-center justify-center !w-full !h-[583px]">
-        <div className="absolute inset-0 opacity-20 !w-[680px] !h-[640px]" style={{ backgroundImage: 'radial-gradient(#ff6b35 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
-        
-        {/* Central Agent */}
+        {/* Animated dot grid background */}
         <motion.div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#0a1628] rounded-3xl border-2 border-[#ff6b35] flex items-center justify-center z-20 shadow-[0_0_60px_rgba(255,107,53,0.5)] w-28 h-28"
-          animate={{ scale: [1, 1.05, 1] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}>
-          <Bot className="w-14 h-14 text-[#ff6b35]" />
+          className="absolute inset-0 opacity-[0.18] !w-[680px] !h-[640px]"
+          style={{
+            backgroundImage: "radial-gradient(#ff6b35 1px, transparent 1px)",
+            backgroundSize: "24px 24px",
+          }}
+          animate={{ backgroundPosition: ["0px 0px", "24px 24px"] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+        />
+
+        {/* Orbital ring around center */}
+        <motion.div
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[180px] h-[180px] rounded-full border border-[#ff6b35]/30 z-10"
+          style={{ boxShadow: "0 0 40px rgba(255,107,53,0.2)" }}
+          animate={{ rotate: 360 }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+        />
+        <motion.div
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] rounded-full border border-[#ff6b35]/15 z-10"
+          animate={{ rotate: -360 }}
+          transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
+        />
+
+        {/* Central Agent with enhanced glow */}
+        <motion.div
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#0a1628] rounded-3xl border-2 border-[#ff6b35] flex items-center justify-center z-20 w-28 h-28"
+          style={{
+            boxShadow: "0 0 60px rgba(255,107,53,0.5), 0 0 120px rgba(255,107,53,0.2)",
+          }}
+          animate={{
+            scale: [1, 1.05, 1],
+            boxShadow: [
+              "0 0 60px rgba(255,107,53,0.5), 0 0 120px rgba(255,107,53,0.2)",
+              "0 0 80px rgba(255,107,53,0.7), 0 0 140px rgba(255,107,53,0.3)",
+              "0 0 60px rgba(255,107,53,0.5), 0 0 120px rgba(255,107,53,0.2)",
+            ],
+          }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <motion.div
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+          >
+            <Bot className="w-14 h-14 text-[#ff6b35]" />
+          </motion.div>
         </motion.div>
 
         {/* Lines and Nodes - shared SVG coordinate system so icons align with line endpoints */}
         <svg className="absolute inset-0 w-full h-full z-10 overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#ff6b35" stopOpacity="0.3" />
+              <stop offset="50%" stopColor="#ff6b35" stopOpacity="0.9" />
+              <stop offset="100%" stopColor="#ff6b35" stopOpacity="0.3" />
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="0.5" result="coloredBlur" />
+              <feMerge>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
           {/* Connecting lines */}
           <g className="pointer-events-none">
             {nodes.map((node, i) => {
@@ -205,17 +256,17 @@ function AgentWorkflowAnimation() {
                   y2={end.y}
                   stroke="#ff6b35"
                   strokeWidth="0.5"
-                  strokeOpacity="0.2"
+                  strokeOpacity="0.15"
                   fill="none"
                 />
                 {/* Draw-in animation: von innen nach außen (center → node) */}
                 <motion.path
                   d={`M ${centerX} ${centerY} L ${end.x} ${end.y}`}
-                  stroke="#ff6b35"
-                  strokeWidth="0.5"
-                  strokeOpacity="0.5"
+                  stroke="url(#lineGradient)"
+                  strokeWidth="0.6"
                   strokeLinecap="round"
                   fill="none"
+                  filter="url(#glow)"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: [0, 1] }}
                   transition={{
@@ -233,8 +284,8 @@ function AgentWorkflowAnimation() {
                 <motion.path
                   d={`M ${centerX} ${centerY} L ${end.x} ${end.y}`}
                   stroke="#ff6b35"
-                  strokeWidth="0.5"
-                  strokeOpacity="0.65"
+                  strokeWidth="0.6"
+                  strokeOpacity="0.8"
                   fill="none"
                   strokeDasharray="1.5 4"
                   initial={{ opacity: 0 }}
@@ -252,6 +303,20 @@ function AgentWorkflowAnimation() {
                     },
                   }}
                 />
+                {/* Data packet - glowing dot flowing along line */}
+                <circle r="1.2" fill="#ff6b35" filter="url(#glow)" opacity="0.9">
+                  <animateMotion
+                    dur={`${1.8 + i * 0.1}s`}
+                    repeatCount="indefinite"
+                    path={`M ${centerX} ${centerY} L ${end.x} ${end.y}`}
+                  />
+                  <animate
+                    attributeName="opacity"
+                    values="0.4;1;0.4"
+                    dur={`${1.8 + i * 0.1}s`}
+                    repeatCount="indefinite"
+                  />
+                </circle>
                 {/* Line label - offset perpendicular to line to avoid overlap */}
                 {(() => {
                   const midX = (centerX + end.x) / 2;
@@ -305,27 +370,62 @@ function AgentWorkflowAnimation() {
           return (
             <motion.div
               key={`node-${i}`}
-              className="absolute -translate-x-1/2 -translate-y-1/2 bg-[#0a1628] rounded-3xl border border-[#ff6b35] flex flex-col items-center justify-center gap-0.5 p-1.5 z-20 shadow-[0_0_30px_rgba(255,107,53,0.4)] w-20 h-20"
-              style={{ left: `${node.x}%`, top: `${node.y}%` }}
+              className="absolute -translate-x-1/2 -translate-y-1/2 bg-[#0a1628] rounded-3xl border border-white/30 flex flex-col items-center justify-center gap-0.5 p-1.5 z-20 w-20 h-20"
+              style={{
+                left: `${node.x}%`,
+                top: `${node.y}%`,
+                boxShadow: "0 0 20px rgba(255,255,255,0.1)",
+              }}
               initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: i * 0.15, type: "spring", stiffness: 200 }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                boxShadow: [
+                  "0 0 20px rgba(255,255,255,0.1)",
+                  "0 0 30px rgba(255,255,255,0.15)",
+                  "0 0 20px rgba(255,255,255,0.1)",
+                ],
+              }}
+              transition={{
+                opacity: { duration: 0.5 },
+                scale: { delay: i * 0.15, type: "spring", stiffness: 200 },
+                boxShadow: {
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: i * 0.4,
+                },
+              }}
             >
-              <NodeIcon className="w-5 h-5 text-[#ff6b35] shrink-0" />
+              <NodeIcon className="w-5 h-5 text-white/80 shrink-0" />
               <span className="text-[10px] font-normal text-white/95 uppercase tracking-wider leading-tight">{node.label}</span>
             </motion.div>
           );
         })}
 
-        {/* Subtle ambient particles */}
-        {[...Array(4)].map((_, i) =>
-        <motion.div
-          key={i}
-          className="absolute w-1 h-1 bg-[#ff6b35]/60 rounded-full"
-          style={{ left: `${20 + i * 20}%`, top: `${30 + (i % 2) * 40}%` }}
-          animate={{ opacity: [0.2, 0.6, 0.2] }}
-          transition={{ duration: 2 + i * 0.5, repeat: Infinity, ease: "easeInOut" }} />
-        )}
+        {/* Enhanced ambient particles - more variety */}
+        {[...Array(8)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full bg-[#ff6b35]"
+            style={{
+              width: 2 + (i % 3),
+              height: 2 + (i % 3),
+              left: `${15 + (i * 11) % 70}%`,
+              top: `${20 + (i * 7) % 60}%`,
+            }}
+            animate={{
+              opacity: [0.15, 0.6, 0.15],
+              scale: [1, 1.3, 1],
+            }}
+            transition={{
+              duration: 2.5 + (i % 4) * 0.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: i * 0.2,
+            }}
+          />
+        ))}
       </div>
     </div>);
 
@@ -766,6 +866,12 @@ function ServicesSection() {
     title: "Maßgeschneiderte Software",
     description: "Enterprise Tools zum Mittelstands Preis: CRM-Assistenten, Angebots-Generatoren, Dokumentations KI. Individuell für Sie entwickelt, nicht von der Stange.",
     features: ["CRM Assistenten", "Angebots Generator", "Kundenservice Bot", "Rechnungsprüfung"]
+  },
+  {
+    icon: ChartLine,
+    title: "Datenanalyse und Analytics",
+    description: "Aus Daten Entscheidungen ableiten: Vertriebsanalysen, KPI-Dashboards, Reporting-Automatisierung. Klare Kennzahlen statt Excel-Chaos.",
+    features: ["Datenquellen zusammenführen", "KPI-Dashboards", "Reporting-Automatisierung", "Handlungsempfehlungen"]
   }];
 
 
@@ -784,11 +890,11 @@ function ServicesSection() {
             So kann ich Ihnen helfen
           </h2>
           <p className="text-xl text-[#5a6a7e] max-w-2xl mx-auto">
-            Von der Analyse bis zur fertigen Lösung — pragmatisch, bezahlbar und auf Ihren Betrieb zugeschnitten.
+            Von der Analyse bis zur fertigen Lösung — pragmatisch und auf Ihren Betrieb zugeschnitten.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 gap-8">
           {services.map((service, i) =>
           <motion.div
             key={i}
@@ -850,7 +956,8 @@ function ImpactSection() {
   "Angebotserstellung",
   "KI-Telefonassistenten",
   "Rechnungsprüfung",
-  "Vertragsverwaltung"];
+  "Vertragsverwaltung",
+  "Vertriebsanalyse"];
 
 
   const caseStudies = [
@@ -903,6 +1010,16 @@ function ImpactSection() {
     "Verlängerungen rechtzeitig gemeldet",
     "Vertragskonditionen automatisch verglichen"]
 
+  },
+  {
+    title: "KPI-Dashboard für Vertrieb",
+    metric: "50%",
+    metricLabel: "weniger Reporting-Aufwand",
+    bullets: [
+    "Echtzeit-Kennzahlen statt monatlicher Excel-Reports",
+    "Umsätze, Pipeline und Conversion automatisch visualisiert",
+    "Handlungsempfehlungen aus Daten abgeleitet"]
+
   }];
 
 
@@ -931,6 +1048,11 @@ function ImpactSection() {
     icon: Briefcase,
     items: ["Fristen prüfen...", "Verlängerung anstehend...", "Erinnerung versendet"],
     color: "text-red-400"
+  },
+  {
+    icon: ChartLine,
+    items: ["Daten laden...", "KPIs berechnen...", "Dashboard aktualisiert"],
+    color: "text-cyan-400"
   }];
 
 

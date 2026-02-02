@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CalendarDays, Mail, Menu, Phone, X } from "lucide-react";
-import { openExternalUrl, CALENDLY_LINK, PHONE_LINK } from "@/lib/links";
+import { openExternalUrl, CALENDLY_LINK, MAILTO_LINK, PHONE_LINK } from "@/lib/links";
 
 const PHONE_NUMBER = "+49 151 21343097";
 
@@ -19,6 +19,7 @@ const navLinks = [
 export function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const openEmail = () => openExternalUrl(MAILTO_LINK);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,20 +66,26 @@ export function Navigation() {
 
               <div className="hidden lg:flex items-center gap-4">
                 <button
+                  type="button"
+                  data-orchids-interactive
                   onClick={openPhone}
                   className="flex items-center gap-2 px-4 py-2.5 text-white/70 hover:text-white font-medium transition-colors"
                 >
                   <Phone className="w-4 h-4" />
                   <span>{PHONE_NUMBER}</span>
                 </button>
-                <Link
-                  href="/kontakt#contact-form"
+                <button
+                  type="button"
+                  data-orchids-interactive
+                  onClick={openEmail}
                   className="flex items-center gap-2 px-4 py-2.5 text-white/70 hover:text-white font-medium transition-colors"
                 >
                   <Mail className="w-4 h-4" />
                   <span>Email</span>
-                </Link>
+                </button>
               <button
+                type="button"
+                data-orchids-interactive
                 onClick={openCalendly}
                 className="flex items-center gap-2 px-6 py-2.5 bg-[#ff6b35] hover:bg-[#ff8c5a] text-white font-bold rounded-full transition-all shadow-lg shadow-[#ff6b35]/20 hover:scale-105 active:scale-95"
               >
@@ -117,6 +124,8 @@ export function Navigation() {
               ))}
                 <div className="pt-6 border-t border-white/10 space-y-4">
                     <button
+                      type="button"
+                      data-orchids-interactive
                       onClick={() => {
                         openPhone();
                         setMobileMenuOpen(false);
@@ -126,15 +135,21 @@ export function Navigation() {
                       <Phone className="w-4 h-4" />
                       <span>{PHONE_NUMBER}</span>
                     </button>
-                    <Link
-                      href="/kontakt#contact-form"
-                      onClick={() => setMobileMenuOpen(false)}
+                    <button
+                      type="button"
+                      data-orchids-interactive
+                      onClick={() => {
+                        openEmail();
+                        setMobileMenuOpen(false);
+                      }}
                       className="flex items-center justify-center gap-2 w-full px-4 py-4 text-white font-medium border border-white/20 rounded-xl hover:bg-white/5 transition-colors"
                     >
                       <Mail className="w-4 h-4" />
                       <span>Anfrage per Email</span>
-                    </Link>
+                    </button>
                 <button
+                  type="button"
+                  data-orchids-interactive
                   onClick={() => {
                     openCalendly();
                     setMobileMenuOpen(false);

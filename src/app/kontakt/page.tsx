@@ -21,7 +21,12 @@ const contactMethods = [
     icon: Mail,
     title: "Anfrage per E-Mail",
     description: "Formular direkt auf der Seite ausfüllen",
-    action: () => document.getElementById("contact-form")?.scrollIntoView({ behavior: "smooth" }),
+    action: () => {
+      const el = document.getElementById("contact-form");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    },
     buttonText: "Formular öffnen",
   },
   {
@@ -49,7 +54,7 @@ const faqs = [
   {
     question: "Für welche Unternehmensgröße sind Ihre Leistungen gedacht?",
     answer:
-      "Ich arbeite primär mit mittelständischen Unternehmen und Enterprise-Kunden, typischerweise ab 50 Mitarbeitern. Die Methoden sind für komplexe Organisationen mit entsprechenden Compliance- und Governance-Anforderungen optimiert.",
+      "Ich arbeite primär mit mittelständischen Unternehmen und Enterprise-Kunden, typischerweise ab 50 Mitarbeitern. Die Methoden sind für komplexe Organisationen mit entsprechenden Compliance- und Governance-Anforderungen optimiert. Falls Sie nicht in diese Zielgruppe fallen: Vereinbaren Sie trotzdem gerne ein Gespräch — gemeinsam finden wir heraus, ob und wie wir eine passende Lösung für Sie entwickeln können.",
   },
   {
     question: "Wie schnell können wir starten?",
@@ -63,11 +68,23 @@ const faqs = [
   },
 ];
 
+function scrollToContactForm() {
+  const el = document.getElementById("contact-form");
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
 export default function KontaktPage() {
   useEffect(() => {
-    if (typeof window !== "undefined" && window.location.hash === "#contact-form") {
-      document.getElementById("contact-form")?.scrollIntoView({ behavior: "smooth" });
-    }
+    const handleHashScroll = () => {
+      if (typeof window !== "undefined" && window.location.hash === "#contact-form") {
+        scrollToContactForm();
+      }
+    };
+    handleHashScroll();
+    window.addEventListener("hashchange", handleHashScroll);
+    return () => window.removeEventListener("hashchange", handleHashScroll);
   }, []);
 
   return (
@@ -155,6 +172,8 @@ export default function KontaktPage() {
                       {method.description}
                     </p>
                     <button
+                      type="button"
+                      data-orchids-interactive
                       onClick={method.action}
                       className={`text-sm font-semibold ${
                         method.highlight
@@ -243,6 +262,8 @@ export default function KontaktPage() {
                 </div>
 
                 <button
+                  type="button"
+                  data-orchids-interactive
                   onClick={() => openExternalUrl(CALENDLY_LINK)}
                   className="w-full flex items-center justify-center gap-2 px-6 py-4 btn-primary text-white font-semibold rounded-xl text-lg"
                 >

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CalendarDays, Mail, Check, ArrowRight, Lightbulb, Target, Clock, Building2, Zap, Users, GraduationCap, Shield, FileText, MessageSquare, Calculator, FileCheck } from "lucide-react";
+import { CalendarDays, Mail, Check, ArrowRight, Lightbulb, Target, Clock, Building2, Zap, Users, GraduationCap, Shield, FileText, MessageSquare, Calculator, FileCheck, BarChart2 } from "lucide-react";
 
 import Link from "next/link";
 import { openExternalUrl, CALENDLY_LINK } from "@/lib/links";
@@ -52,6 +52,21 @@ const services = [
     timeline: "4-8 Wochen",
     ideal: "Unternehmen mit spezifischen Anforderungen, die keine Standardlösung abdeckt",
   },
+  {
+    icon: BarChart2,
+    title: "Datenanalyse und Analytics",
+    subtitle: "Aus Daten Entscheidungen ableiten",
+    description:
+      "Ihre Geschäftsdaten systematisch auswerten: Vertriebsanalysen, KPI-Dashboards, Reporting-Automatisierung. Ich helfe Ihnen, aus Excel-Chaos und verstreuten Quellen klare Kennzahlen und Handlungsempfehlungen zu gewinnen.",
+    deliverables: [
+      "Datenquellen erfassen und zusammenführen",
+      "KPI-Dashboards und Reports erstellen",
+      "Reporting-Automatisierung einrichten",
+      "Handlungsempfehlungen ableiten",
+    ],
+    timeline: "2-3 Wochen",
+    ideal: "Unternehmen, die mehr aus ihren Daten machen und datenbasierte Entscheidungen treffen wollen",
+  },
 ];
 
 const examples = [
@@ -75,6 +90,11 @@ const examples = [
     title: "Rechnungsprüfung",
     description: "Eingangsrechnungen erfassen, mit Bestellungen abgleichen, Freigabe Workflows automatisieren.",
   },
+  {
+    icon: BarChart2,
+    title: "Vertriebs-Dashboard",
+    description: "Umsätze, Pipeline und Conversion automatisch visualisieren. Kennzahlen statt Excel-Tabellen.",
+  },
 ];
 
 export default function LeistungenPage() {
@@ -96,7 +116,7 @@ export default function LeistungenPage() {
               <span className="text-gradient-orange">Mittelstand</span>
             </h1>
             <p className="text-xl lg:text-2xl text-[#5a6a7e] leading-relaxed">
-              Von der Analyse bis zur fertigen Lösung. Pragmatisch, bezahlbar und auf Ihren Betrieb zugeschnitten.
+              Von der Analyse bis zur fertigen Lösung. Pragmatisch und auf Ihren Betrieb zugeschnitten.
             </p>
           </motion.div>
         </div>
