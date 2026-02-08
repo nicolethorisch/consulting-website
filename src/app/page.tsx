@@ -506,7 +506,7 @@ function HeroSection() {
 
             <motion.h1
               variants={fadeInUp}
-              className="text-4xl md:text-5xl lg:text-7xl font-bold bg-gradient-to-r from-white via-white to-[#ff6b35] bg-clip-text text-transparent leading-[1.1] mb-4 !whitespace-pre-line">KI-Vorsprung für den Mittelstand
+              className="text-4xl md:text-5xl lg:text-7xl font-bold bg-gradient-to-r from-white via-white to-[#ff6b35] bg-clip-text text-transparent leading-[1.1] mb-4 !whitespace-pre-line">KI-Vorsprung für Immobilienverwaltungen
             </motion.h1>
             <motion.p
               variants={fadeInUp}
@@ -1121,7 +1121,7 @@ function ImpactSection() {
             </div>
 
             <div className="relative">
-              <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 lg:p-8 min-h-[300px] flex flex-col justify-between overflow-hidden">
+              <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 lg:p-8 min-h-[300px] aspect-[4/3] w-full flex flex-col justify-between overflow-hidden">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={activeTab}

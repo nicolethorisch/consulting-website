@@ -44,9 +44,9 @@ export function Navigation() {
         }`}>
           <Link href="/" className="flex items-center gap-3">
             <img 
-              src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/project-uploads/ebddd4d1-529f-4f5c-8cf9-5c0783c3927a/nicole-thorisch-logo-komplett-zoomed-1769432467459.png?width=8000&height=8000&resize=contain" 
+              src="/brand/nicole-thorisch-logo-white.png" 
               alt="Nicole Thorisch Logo" 
-              className={`transition-all duration-300 w-auto object-contain brightness-0 invert ${
+              className={`transition-all duration-300 w-auto object-contain ${
                 scrolled ? "h-10" : "h-12"
               }`}
             />

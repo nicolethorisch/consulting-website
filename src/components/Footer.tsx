@@ -14,14 +14,14 @@ export function Footer() {
             <div className="lg:col-span-2">
               <Link href="/" className="flex items-center gap-3 mb-6">
                 <img 
-                  src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/project-uploads/ebddd4d1-529f-4f5c-8cf9-5c0783c3927a/nicole-thorisch-logo-komplett-zoomed-1769432467459.png?width=8000&height=8000&resize=contain" 
+                  src="/brand/nicole-thorisch-logo-white.png" 
                   alt="Nicole Thorisch Logo" 
-                  className="h-40 w-auto object-contain brightness-0 invert"
+                  className="h-40 w-auto object-contain"
                 />
               </Link>
             <div className="mb-8">
               <p className="text-[#94a3b8] text-lg leading-relaxed max-w-md">
-                KI, die liefert. Keine Buzzwords, keine Pilotprojekte ohne Ende.
+                KI, die liefert. Planbar, zuverlässig.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
