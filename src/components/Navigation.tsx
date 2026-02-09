@@ -43,12 +43,10 @@ export function Navigation() {
           scrolled ? "h-16" : "h-20"
         }`}>
           <Link href="/" className="flex items-center gap-3">
-            <img 
-              src="/brand/nicole-thorisch-logo-white.png" 
-              alt="Nicole Thorisch Logo" 
-              className={`transition-all duration-300 w-auto object-contain ${
-                scrolled ? "h-10" : "h-12"
-              }`}
+            <img
+              src="/brand/nicole-thorisch-logo-white.png"
+              alt="Nicole Thorisch Logo"
+              className="transition-all duration-300 w-auto object-contain h-10"
             />
           </Link>
 

@@ -178,53 +178,26 @@ function AgentWorkflowAnimation() {
   return (
     <div className="relative w-full aspect-square max-w-2xl mx-auto scale-100 origin-center">
       <div className="absolute inset-0 flex items-center justify-center !w-full !h-[583px]">
-        {/* Animated dot grid background */}
-        <motion.div
+        {/* Static dot grid background */}
+        <div
           className="absolute inset-0 opacity-[0.18] !w-[680px] !h-[640px]"
           style={{
             backgroundImage: "radial-gradient(#ff6b35 1px, transparent 1px)",
             backgroundSize: "24px 24px",
           }}
-          animate={{ backgroundPosition: ["0px 0px", "24px 24px"] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         />
 
-        {/* Orbital ring around center */}
-        <motion.div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[180px] h-[180px] rounded-full border border-[#ff6b35]/30 z-10"
-          style={{ boxShadow: "0 0 40px rgba(255,107,53,0.2)" }}
-          animate={{ rotate: 360 }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-        />
-        <motion.div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] rounded-full border border-[#ff6b35]/15 z-10"
-          animate={{ rotate: -360 }}
-          transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
-        />
-
-        {/* Central Agent with enhanced glow */}
-        <motion.div
+        {/* Central Agent with glow */}
+        <div
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#0a1628] rounded-3xl border-2 border-[#ff6b35] flex items-center justify-center z-20 w-28 h-28"
           style={{
             boxShadow: "0 0 60px rgba(255,107,53,0.5), 0 0 120px rgba(255,107,53,0.2)",
           }}
-          animate={{
-            scale: [1, 1.05, 1],
-            boxShadow: [
-              "0 0 60px rgba(255,107,53,0.5), 0 0 120px rgba(255,107,53,0.2)",
-              "0 0 80px rgba(255,107,53,0.7), 0 0 140px rgba(255,107,53,0.3)",
-              "0 0 60px rgba(255,107,53,0.5), 0 0 120px rgba(255,107,53,0.2)",
-            ],
-          }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         >
-          <motion.div
-            animate={{ scale: [1, 1.1, 1] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-          >
+          <div>
             <Bot className="w-14 h-14 text-[#ff6b35]" />
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
         {/* Lines and Nodes - shared SVG coordinate system so icons align with line endpoints */}
         <svg className="absolute inset-0 w-full h-full z-10 overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -259,64 +232,23 @@ function AgentWorkflowAnimation() {
                   strokeOpacity="0.15"
                   fill="none"
                 />
-                {/* Draw-in animation: von innen nach außen (center → node) */}
-                <motion.path
-                  d={`M ${centerX} ${centerY} L ${end.x} ${end.y}`}
-                  stroke="url(#lineGradient)"
-                  strokeWidth="0.6"
-                  strokeLinecap="round"
-                  fill="none"
-                  filter="url(#glow)"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: [0, 1] }}
-                  transition={{
-                    pathLength: {
-                      duration: 1.5,
-                      delay: i * 0.15,
-                      repeat: Infinity,
-                      repeatType: "reverse",
-                      ease: "easeInOut",
-                      repeatDelay: 0.3,
-                    },
-                  }}
-                />
-                {/* Flowing dashed animation - data moving along the line */}
+                {/* Dotted line with outward motion (center → node) */}
                 <motion.path
                   d={`M ${centerX} ${centerY} L ${end.x} ${end.y}`}
                   stroke="#ff6b35"
                   strokeWidth="0.6"
                   strokeOpacity="0.8"
                   fill="none"
-                  strokeDasharray="1.5 4"
-                  initial={{ opacity: 0 }}
-                  animate={{
-                    opacity: 1,
-                    strokeDashoffset: [0, -5.5],
-                  }}
+                  strokeDasharray="2 4"
+                  initial={{ strokeDashoffset: 0 }}
+                  animate={{ strokeDashoffset: [-8, 0] }}
                   transition={{
-                    opacity: { duration: 0.3, delay: 0.7 + i * 0.12 },
-                    strokeDashoffset: {
-                      duration: 1.2,
-                      repeat: Infinity,
-                      ease: "linear",
-                      delay: 1 + i * 0.15,
-                    },
+                    duration: 2.6,
+                    repeat: Infinity,
+                    ease: "linear",
+                    delay: i * 0.1,
                   }}
                 />
-                {/* Data packet - glowing dot flowing along line */}
-                <circle r="1.2" fill="#ff6b35" filter="url(#glow)" opacity="0.9">
-                  <animateMotion
-                    dur={`${1.8 + i * 0.1}s`}
-                    repeatCount="indefinite"
-                    path={`M ${centerX} ${centerY} L ${end.x} ${end.y}`}
-                  />
-                  <animate
-                    attributeName="opacity"
-                    values="0.4;1;0.4"
-                    dur={`${1.8 + i * 0.1}s`}
-                    repeatCount="indefinite"
-                  />
-                </circle>
                 {/* Line label - offset perpendicular to line to avoid overlap */}
                 {(() => {
                   const midX = (centerX + end.x) / 2;
@@ -333,7 +265,7 @@ function AgentWorkflowAnimation() {
                   const deg = (angle * 180) / Math.PI;
                   const rotate = deg > 90 || deg < -90 ? deg + 180 : deg;
                   return (
-                    <motion.text
+                    <text
                       x={labelX}
                       y={labelY}
                       textAnchor="middle"
@@ -343,9 +275,6 @@ function AgentWorkflowAnimation() {
                       fontWeight="500"
                       style={{ fontFamily: "system-ui, sans-serif" }}
                       transform={`rotate(${rotate} ${labelX} ${labelY})`}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.5, delay: 0.5 + i * 0.1 }}
                     >
                       {Array.isArray(node.lineLabel)
                         ? node.lineLabel.map((line, j) => (
@@ -354,7 +283,7 @@ function AgentWorkflowAnimation() {
                             </tspan>
                           ))
                         : node.lineLabel}
-                    </motion.text>
+                    </text>
                   );
                 })()}
               </g>
@@ -368,7 +297,7 @@ function AgentWorkflowAnimation() {
         {nodes.map((node, i) => {
           const NodeIcon = node.icon;
           return (
-            <motion.div
+            <div
               key={`node-${i}`}
               className="absolute -translate-x-1/2 -translate-y-1/2 bg-[#0a1628] rounded-3xl border border-white/30 flex flex-col items-center justify-center gap-0.5 p-1.5 z-20 w-20 h-20"
               style={{
@@ -376,56 +305,12 @@ function AgentWorkflowAnimation() {
                 top: `${node.y}%`,
                 boxShadow: "0 0 20px rgba(255,255,255,0.1)",
               }}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                boxShadow: [
-                  "0 0 20px rgba(255,255,255,0.1)",
-                  "0 0 30px rgba(255,255,255,0.15)",
-                  "0 0 20px rgba(255,255,255,0.1)",
-                ],
-              }}
-              transition={{
-                opacity: { duration: 0.5 },
-                scale: { delay: i * 0.15, type: "spring", stiffness: 200 },
-                boxShadow: {
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: i * 0.4,
-                },
-              }}
             >
               <NodeIcon className="w-5 h-5 text-white/80 shrink-0" />
               <span className="text-[10px] font-normal text-white/95 uppercase tracking-wider leading-tight">{node.label}</span>
-            </motion.div>
+            </div>
           );
         })}
-
-        {/* Enhanced ambient particles - more variety */}
-        {[...Array(8)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute rounded-full bg-[#ff6b35]"
-            style={{
-              width: 2 + (i % 3),
-              height: 2 + (i % 3),
-              left: `${15 + (i * 11) % 70}%`,
-              top: `${20 + (i * 7) % 60}%`,
-            }}
-            animate={{
-              opacity: [0.15, 0.6, 0.15],
-              scale: [1, 1.3, 1],
-            }}
-            transition={{
-              duration: 2.5 + (i % 4) * 0.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: i * 0.2,
-            }}
-          />
-        ))}
       </div>
     </div>);
 
